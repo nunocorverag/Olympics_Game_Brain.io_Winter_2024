@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI; // Needed for UI if you're displaying score on the screen.
 using Platformer.Gameplay;
 using static Platformer.Core.Simulation;
 using Platformer.Model;
@@ -18,7 +19,6 @@ namespace Platformer.Mechanics
         public AudioClip jumpAudio;
         public AudioClip respawnAudio;
         public AudioClip ouchAudio;
-
 
         /// <summary>
         /// Max horizontal speed of the player.
@@ -72,8 +72,9 @@ namespace Platformer.Mechanics
             }
             UpdateJumpState();
             base.Update();
-        }
 
+
+        }
         void UpdateJumpState()
         {
             jump = false;
