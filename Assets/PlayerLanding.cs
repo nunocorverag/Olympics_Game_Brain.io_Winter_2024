@@ -71,7 +71,7 @@ public class PlayerLanding : MonoBehaviour
         
         // Reset time scale to normal before changing the scene.
         yield return new WaitForSecondsRealtime(delay);
-        Time.timeScale = 0;
+        Time.timeScale = 1;
         // Switch to the specified scene (GameOverScene in this case).
         SceneManager.LoadScene(sceneToLoad);
     }

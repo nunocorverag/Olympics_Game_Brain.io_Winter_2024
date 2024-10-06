@@ -6,6 +6,8 @@ using Platformer.Gameplay;
 using static Platformer.Core.Simulation;
 using Platformer.Model;
 using Platformer.Core;
+using UnityEngine.SceneManagement; // Needed to switch scenes.
+using TMPro; // For TextMeshPro, remove if you use Unity's standard Text
 
 namespace Platformer.Mechanics
 {
@@ -31,12 +33,15 @@ namespace Platformer.Mechanics
         SpriteRenderer spriteRenderer;
         internal Animator animator;
         readonly PlatformerModel model = Simulation.GetModel<PlatformerModel>();
+        public string sceneToLoad = "Dummy";
 
         public Bounds Bounds => collider2d.bounds;
 
         public Sprite knockedDownFenceSprite; // The new sprite for the knocked-down fence
 
         private bool isRecoveringSpeed = false; // Bandera para indicar si se está recuperando la velocidad
+        public TMP_Text timeText; // Assign this in the Inspector if using TextMeshPro
+        private float elapsedTime = 0f; // Stores the total time elapsed
 
         void Awake()
         {
@@ -62,6 +67,14 @@ namespace Platformer.Mechanics
 
         protected override void Update()
         {
+            elapsedTime += Time.deltaTime;
+
+            // Optional: Update the displayed time
+            if (timeText != null)
+            {
+                timeText.text = FormatTime(elapsedTime); // Update the UI
+            }
+
             if (controlEnabled)
             {
                 // Move forward only if not recovering speed
@@ -201,6 +214,12 @@ namespace Platformer.Mechanics
                     Debug.LogError("Error: fenceSpriteRenderer o knockedDownFenceSprite es nulo.");
                 }
             }
+            if(other.CompareTag("JumpDetector"))
+            {
+                timeText.text = "Time: " + FormatTime(elapsedTime) + "\nScore: " + (60 - elapsedTime);
+                Time.timeScale = 0;
+                StartCoroutine(SwitchSceneAfterDelay(2f));
+            }
         }
 
         public enum JumpState
@@ -210,6 +229,21 @@ namespace Platformer.Mechanics
             Jumping,
             InFlight,
             Landed
+        }
+
+        IEnumerator SwitchSceneAfterDelay(float delay)
+        {
+            // Reset time scale to normal before changing the scene.
+            yield return new WaitForSecondsRealtime(delay);
+            Time.timeScale = 1;
+            // Switch to the specified scene (GameOverScene in this case).
+            SceneManager.LoadScene(sceneToLoad);
+        }
+        private string FormatTime(float time)
+        {
+            int minutes = Mathf.FloorToInt(time / 60F);
+            int seconds = Mathf.FloorToInt(time % 60F);
+            return string.Format("{0:00}:{1:00}", minutes, seconds);
         }
     }
 }
