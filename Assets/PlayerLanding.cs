@@ -51,8 +51,9 @@ public class PlayerLanding : MonoBehaviour
             
         }
         // Check if the player landed on the "Sand" object.
-        if (collision.gameObject.tag == "Player" && (hasBounced))
+        else
         {
+            playerController.Stop();
             Time.timeScale = 1;
             StartCoroutine(SwitchSceneAfterDelay(2f));
         }
