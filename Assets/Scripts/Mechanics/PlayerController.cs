@@ -145,12 +145,10 @@ namespace Platformer.Mechanics
         // Detectar si está cerca de la arena para permitir saltar
         void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.CompareTag("Sand"))
+            if (other.CompareTag("JumpDetector"))
             {
                 if (!hasJumped) // Solo permitir el salto una vez
                 {
-                    Debug.Log("Collision detected, sand touched");
-
                     // Forzar el salto inmediatamente al tocar la arena
                     jumpTakeOffSpeed = baseJumpTakeOffSpeed + (spacebarPressCount * jumpMultiplier);
                     velocity.y = jumpTakeOffSpeed * model.jumpModifier;
@@ -166,7 +164,7 @@ namespace Platformer.Mechanics
         // Cuando salga de la arena, ya no puede saltar
         void OnTriggerExit2D(Collider2D other)
         {
-            if (other.CompareTag("Sand"))
+            if (other.CompareTag("JumpDetector"))
             {
                 // Aquí no es necesario hacer nada, ya que el salto se controla solo con hasJumped
             }
