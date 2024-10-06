@@ -178,5 +178,14 @@ namespace Platformer.Mechanics
             InFlight,
             Landed
         }
+
+        public void Bounce(int boost)
+        {
+            Debug.Log("Bounce");
+                // Set the upward velocity and horizontal boost
+                velocity.y = spacebarPressCount * jumpMultiplier;
+                velocity.x = horizontalJumpBoost; // Apply forward distance
+            
+        }
     }
 }

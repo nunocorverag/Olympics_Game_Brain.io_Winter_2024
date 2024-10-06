@@ -1358,7 +1358,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.5593176, y: 0.08549732, z: -9}
+  m_LocalPosition: {x: 2.4250264, y: 0.08549732, z: -9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -77560,6 +77560,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 50915408107096866, guid: 7d60c822c3f1b408ea7a00ecdb5e047a,
+        type: 3}
+      propertyPath: m_UseFullKinematicContacts
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 114230831923080080, guid: 7d60c822c3f1b408ea7a00ecdb5e047a,
         type: 3}
       propertyPath: sand
@@ -77917,6 +77922,10 @@ MonoBehaviour:
   playerTransform: {fileID: 1213308513}
   scoreText: {fileID: 326085343}
   sceneToLoad: Dummy
+  bounceHeight: 1.5
+  bounceForwardDistance: 2
+  bounceForce: 10
+  playerController: {fileID: 838423048}
 --- !u!212 &1094303206
 SpriteRenderer:
   m_ObjectHideFlags: 0
