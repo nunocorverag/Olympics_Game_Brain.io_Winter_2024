@@ -1,11 +1,15 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement; // Needed to switch scenes.
+using System.Collections;
 
 public class PlayerLanding : MonoBehaviour
 {
     public Transform playerTransform; // Assign the Sand's transform in the Unity Editor.
     public TMP_Text scoreText; // Assign the UI Text element for displaying the score.
     private float highScore = 0; // Variable to store the high score.
+    public string sceneToLoad = "Dummy"; // Assign the scene to switch to on collision.
+
 
 
     // This function is triggered when the player's collider touches another collider.
@@ -26,10 +30,26 @@ public class PlayerLanding : MonoBehaviour
 
                 // Update the high score text.
             }
+
             scoreText.text = "High Score: " + highScore + "\n" + "Score: " + distanceX.ToString("F2"); // "F2" for 2 decimal places.
+            Time.timeScale = 0;
+            StartCoroutine(SwitchSceneAfterDelay(2f));
         }
+        
+
     }
-    void Awake()
+    IEnumerator SwitchSceneAfterDelay(float delay)
+    {
+        // Wait for the specified delay (ignores time scale).
+        yield return new WaitForSecondsRealtime(delay);
+
+        // Reset time scale to normal before changing the scene.
+        Time.timeScale = 1;
+
+        // Switch to the specified scene (GameOverScene in this case).
+        SceneManager.LoadScene(sceneToLoad);
+    }
+    void Start()
     {
         scoreText.text = "High Score: " + highScore;
     }
