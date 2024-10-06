@@ -30,6 +30,7 @@ namespace Platformer.Mechanics
 
         public int spacebarPressCount = 0; // Contador de presiones de barra espaciadora
         public float jumpMultiplier = 0.5f; // Multiplicador de salto por cada presión de barra espaciadora
+        public float horizontalJumpBoost = 5f; // Impulso horizontal adicional al saltar
 
         Vector2 move;
         SpriteRenderer spriteRenderer;
@@ -111,6 +112,10 @@ namespace Platformer.Mechanics
             {
                 // La fuerza de salto se ajusta en función de la cantidad de veces que se presionó la barra espaciadora
                 jumpTakeOffSpeed = baseJumpTakeOffSpeed + (spacebarPressCount * jumpMultiplier);
+
+                // Aplicar impulso horizontal adicional
+                velocity.x = horizontalJumpBoost; // Aumenta la velocidad horizontal durante el salto
+
                 velocity.y = jumpTakeOffSpeed * model.jumpModifier;
                 jump = false;
                 hasJumped = true; // Marcar que se ha saltado
@@ -149,6 +154,10 @@ namespace Platformer.Mechanics
                     // Forzar el salto inmediatamente al tocar la arena
                     jumpTakeOffSpeed = baseJumpTakeOffSpeed + (spacebarPressCount * jumpMultiplier);
                     velocity.y = jumpTakeOffSpeed * model.jumpModifier;
+
+                    // Aplicar impulso horizontal adicional
+                    velocity.x = horizontalJumpBoost; // Aumenta la velocidad horizontal durante el salto
+
                     hasJumped = true; // Marcar que se ha saltado
                 }
             }
