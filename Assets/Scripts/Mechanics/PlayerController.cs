@@ -5,6 +5,7 @@ using Platformer.Gameplay;
 using static Platformer.Core.Simulation;
 using Platformer.Model;
 using Platformer.Core;
+using Unity.VisualScripting;
 
 namespace Platformer.Mechanics
 {
@@ -17,6 +18,7 @@ namespace Platformer.Mechanics
         public AudioClip jumpAudio;
         public AudioClip respawnAudio;
         public AudioClip ouchAudio;
+
 
         /// <summary>
         /// Max horizontal speed of the player.
