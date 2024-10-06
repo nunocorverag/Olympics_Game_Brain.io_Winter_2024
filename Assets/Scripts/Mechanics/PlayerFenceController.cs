@@ -103,14 +103,12 @@ namespace Platformer.Mechanics
                 case JumpState.Jumping:
                     if (!IsGrounded)
                     {
-                        Schedule<PlayerJumped>().player = this;
                         jumpState = JumpState.InFlight;
                     }
                     break;
                 case JumpState.InFlight:
                     if (IsGrounded)
                     {
-                        Schedule<PlayerLanded>().player = this;
                         jumpState = JumpState.Landed;
                     }
                     break;
