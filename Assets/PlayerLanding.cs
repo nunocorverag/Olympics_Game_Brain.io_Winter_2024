@@ -29,4 +29,8 @@ public class PlayerLanding : MonoBehaviour
             scoreText.text = "High Score: " + highScore + "\n" + "Score: " + distanceX.ToString("F2"); // "F2" for 2 decimal places.
         }
     }
+    void Awake()
+    {
+        scoreText.text = "High Score: " + highScore;
+    }
 }
