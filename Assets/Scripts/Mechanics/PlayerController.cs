@@ -39,6 +39,7 @@ namespace Platformer.Mechanics
         readonly PlatformerModel model = Simulation.GetModel<PlatformerModel>();
 
         public Bounds Bounds => collider2d.bounds;
+        bool shouldMove = true;
 
         void Awake()
         {
@@ -47,6 +48,7 @@ namespace Platformer.Mechanics
             collider2d = GetComponent<Collider2D>();
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
+            shouldMove = true;
         }
 
         protected override void Update()
@@ -54,7 +56,11 @@ namespace Platformer.Mechanics
             if (controlEnabled)
             {
                 // El personaje siempre avanza hacia la derecha
-                move.x = 1; // Siempre avanzamos en la dirección positiva en el eje X
+                if (shouldMove)
+                {
+                    move.x = 1; // Siempre avanzamos en la dirección positiva en el eje X
+                }
+                
 
                 // Contar las presiones de la barra espaciadora
                 if (Input.GetButtonDown("Jump"))
@@ -180,9 +186,20 @@ namespace Platformer.Mechanics
             Landed
         }
 
-        public static implicit operator PlayerController(PlayerFenceController v)
+        public void Bounce(int boost)
         {
-            throw new NotImplementedException();
+            Debug.Log("Bounce");
+                // Set the upward velocity and horizontal boost
+                velocity.y = spacebarPressCount * jumpMultiplier;
+                velocity.x = horizontalJumpBoost; // Apply forward distance
+            
+        }
+        public void Stop()
+        {
+            Debug.Log("Should stop lol");
+            move.x = 0;
+            shouldMove = false;
+            velocity.y = 0;
         }
     }
 }

@@ -738,11 +738,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: 3a3c2640-bbcd-4701-b10d-bbe2dfb8c41d
+  cloudProjectId: 652ed102-7250-494c-a026-41e50d24a8a0
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: Olympics_Game 2024-10-06_03-06-28
-  organizationId: a01644775
+  projectName: Olympics_Game_Brain.io_Winter_2024
+  organizationId: tilininsano777
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
