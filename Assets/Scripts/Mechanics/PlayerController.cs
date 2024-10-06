@@ -1,42 +1,36 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; // Needed for UI if you're displaying score on the screen.
+using UnityEngine.UI;
 using Platformer.Gameplay;
 using static Platformer.Core.Simulation;
 using Platformer.Model;
 using Platformer.Core;
-using Unity.VisualScripting;
 
 namespace Platformer.Mechanics
 {
-    /// <summary>
-    /// This is the main class used to implement control of the player.
-    /// It is a superset of the AnimationController class, but is inlined to allow for any kind of customisation.
-    /// </summary>
     public class PlayerController : KinematicObject
     {
         public AudioClip jumpAudio;
         public AudioClip respawnAudio;
         public AudioClip ouchAudio;
 
-        /// <summary>
-        /// Max horizontal speed of the player.
-        /// </summary>
-        public float maxSpeed = 7;
-        /// <summary>
-        /// Initial jump velocity at the start of a jump.
-        /// </summary>
-        public float jumpTakeOffSpeed = 7;
+        public float maxSpeed = 7; // Velocidad máxima horizontal
+        public float baseJumpTakeOffSpeed = 7; // Velocidad inicial base del salto
+        private float jumpTakeOffSpeed; // Velocidad de salto ajustada
+        private bool hasJumped = false; // Para controlar si ya se ha saltado
 
         public JumpState jumpState = JumpState.Grounded;
         private bool stopJump;
-        /*internal new*/ public Collider2D collider2d;
-        /*internal new*/ public AudioSource audioSource;
+
+        public Collider2D collider2d;
+        public AudioSource audioSource;
         public Health health;
         public bool controlEnabled = true;
 
-        bool jump;
+        public int spacebarPressCount = 0; // Contador de presiones de barra espaciadora
+        public float jumpMultiplier = 0.5f; // Multiplicador de salto por cada presión de barra espaciadora
+
         Vector2 move;
         SpriteRenderer spriteRenderer;
         internal Animator animator;
@@ -57,9 +51,15 @@ namespace Platformer.Mechanics
         {
             if (controlEnabled)
             {
-                move.x = Input.GetAxis("Horizontal");
-                if (jumpState == JumpState.Grounded && Input.GetButtonDown("Jump"))
-                    jumpState = JumpState.PrepareToJump;
+                // El personaje siempre avanza hacia la derecha
+                move.x = 1; // Siempre avanzamos en la dirección positiva en el eje X
+
+                // Contar las presiones de la barra espaciadora
+                if (Input.GetButtonDown("Jump"))
+                {
+                    spacebarPressCount++; // Incrementa el contador cada vez que se presiona la barra espaciadora
+                }
+
                 else if (Input.GetButtonUp("Jump"))
                 {
                     stopJump = true;
@@ -68,16 +68,16 @@ namespace Platformer.Mechanics
             }
             else
             {
-                move.x = 0;
+                move.x = 0; // Si el control está deshabilitado, no se mueve
             }
+
             UpdateJumpState();
             base.Update();
-
-
         }
+
         void UpdateJumpState()
         {
-            jump = false;
+            bool jump = false;
             switch (jumpState)
             {
                 case JumpState.PrepareToJump:
@@ -101,18 +101,25 @@ namespace Platformer.Mechanics
                     break;
                 case JumpState.Landed:
                     jumpState = JumpState.Grounded;
+                    // Reseteamos el contador de presiones y la variable hasJumped cuando aterriza
+                    spacebarPressCount = 0;
+                    hasJumped = false; // Permitir un nuevo salto
                     break;
+            }
+
+            if (jump && IsGrounded)
+            {
+                // La fuerza de salto se ajusta en función de la cantidad de veces que se presionó la barra espaciadora
+                jumpTakeOffSpeed = baseJumpTakeOffSpeed + (spacebarPressCount * jumpMultiplier);
+                velocity.y = jumpTakeOffSpeed * model.jumpModifier;
+                jump = false;
+                hasJumped = true; // Marcar que se ha saltado
             }
         }
 
         protected override void ComputeVelocity()
         {
-            if (jump && IsGrounded)
-            {
-                velocity.y = jumpTakeOffSpeed * model.jumpModifier;
-                jump = false;
-            }
-            else if (stopJump)
+            if (stopJump)
             {
                 stopJump = false;
                 if (velocity.y > 0)
@@ -121,15 +128,39 @@ namespace Platformer.Mechanics
                 }
             }
 
-            if (move.x > 0.01f)
-                spriteRenderer.flipX = false;
-            else if (move.x < -0.01f)
-                spriteRenderer.flipX = true;
+            // Actualización del sprite y animaciones
+            spriteRenderer.flipX = false; // Como siempre avanza a la derecha, no volteamos el sprite
 
             animator.SetBool("grounded", IsGrounded);
             animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / maxSpeed);
 
             targetVelocity = move * maxSpeed;
+        }
+
+        // Detectar si está cerca de la arena para permitir saltar
+        void OnTriggerEnter2D(Collider2D other)
+        {
+            if (other.CompareTag("Sand"))
+            {
+                if (!hasJumped) // Solo permitir el salto una vez
+                {
+                    Debug.Log("Collision detected, sand touched");
+
+                    // Forzar el salto inmediatamente al tocar la arena
+                    jumpTakeOffSpeed = baseJumpTakeOffSpeed + (spacebarPressCount * jumpMultiplier);
+                    velocity.y = jumpTakeOffSpeed * model.jumpModifier;
+                    hasJumped = true; // Marcar que se ha saltado
+                }
+            }
+        }
+
+        // Cuando salga de la arena, ya no puede saltar
+        void OnTriggerExit2D(Collider2D other)
+        {
+            if (other.CompareTag("Sand"))
+            {
+                // Aquí no es necesario hacer nada, ya que el salto se controla solo con hasJumped
+            }
         }
 
         public enum JumpState
