@@ -6,6 +6,7 @@ using Platformer.Gameplay;
 using static Platformer.Core.Simulation;
 using Platformer.Model;
 using Platformer.Core;
+using System;
 
 namespace Platformer.Mechanics
 {
@@ -177,6 +178,11 @@ namespace Platformer.Mechanics
             Jumping,
             InFlight,
             Landed
+        }
+
+        public static implicit operator PlayerController(PlayerFenceController v)
+        {
+            throw new NotImplementedException();
         }
     }
 }
