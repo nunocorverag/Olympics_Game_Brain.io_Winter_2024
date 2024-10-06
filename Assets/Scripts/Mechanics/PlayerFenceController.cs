@@ -72,7 +72,7 @@ namespace Platformer.Mechanics
             // Optional: Update the displayed time
             if (timeText != null)
             {
-                timeText.text = FormatTime(elapsedTime); // Update the UI
+                timeText.text = "Time: " + FormatTime(elapsedTime) + "\nScore: " + (60 - elapsedTime);
             }
 
             if (controlEnabled)
@@ -216,8 +216,6 @@ namespace Platformer.Mechanics
             }
             if(other.CompareTag("JumpDetector"))
             {
-                timeText.text = "Time: " + FormatTime(elapsedTime) + "\nScore: " + (60 - elapsedTime);
-                Time.timeScale = 0;
                 StartCoroutine(SwitchSceneAfterDelay(2f));
             }
         }
@@ -233,6 +231,7 @@ namespace Platformer.Mechanics
 
         IEnumerator SwitchSceneAfterDelay(float delay)
         {
+            Time.timeScale = 0;
             // Reset time scale to normal before changing the scene.
             yield return new WaitForSecondsRealtime(delay);
             Time.timeScale = 1;
