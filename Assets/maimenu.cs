@@ -5,8 +5,13 @@ using UnityEngine.SceneManagement;
 
 public class maimenu : MonoBehaviour
 {
-    public void RunGame ()
+    public void FenceGame ()
     {
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(2);
+    }
+
+    public void JumpGame ()
+    {
+        SceneManager.LoadScene(1);
     }
 }
