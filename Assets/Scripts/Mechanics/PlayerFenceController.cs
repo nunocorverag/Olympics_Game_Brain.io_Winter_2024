@@ -43,6 +43,16 @@ namespace Platformer.Mechanics
         public TMP_Text timeText; // Assign this in the Inspector if using TextMeshPro
         private float elapsedTime = 0f; // Stores the total time elapsed
 
+        public void Jump()
+        {
+            if (IsGrounded)
+            {
+                Debug.Log("PlayerFenceController: Saltando...");
+                jumpTakeOffSpeed = baseJumpTakeOffSpeed;
+                velocity.y = jumpTakeOffSpeed * model.jumpModifier;
+            }
+        }
+
         void Awake()
         {
             health = GetComponent<Health>();
