@@ -80,8 +80,8 @@ namespace Platformer.Mechanics
                     move.x = 1; // Siempre avanzamos en la dirección positiva en el eje X
                 }
 
-                // Contar las presiones de la barra espaciadora
-                if (Input.GetButtonDown("Jump"))
+                // Contar las presiones de la barra espaciadora, pero solo si no ha saltado aún en esta colisión
+                if (Input.GetButtonDown("Jump") && !hasJumped) // No incrementar si ya saltó en JumpDetector
                 {
                     IncrementSpacebarPressCount(); // Usar el método para incrementar
                 }
@@ -285,6 +285,8 @@ namespace Platformer.Mechanics
                     velocity.x = horizontalJumpBoost; // Aumenta la velocidad horizontal durante el salto
 
                     hasJumped = true; // Marcar que se ha saltado
+
+                    // Aquí puedes agregar código para deshabilitar la entrada de salto mientras está en el aire si es necesario
                 }
             }
         }

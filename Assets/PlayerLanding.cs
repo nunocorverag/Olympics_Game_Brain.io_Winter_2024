@@ -11,7 +11,7 @@ public class PlayerLanding : MonoBehaviour
     public TMP_Text scoreText; // Assign the UI Text element for displaying the score.
 
     private float highScore = 0; // Variable to store the high score.
-    public string sceneToLoad = "Dummy"; // Assign the scene to switch to on collision.
+    public string sceneToLoad = "Main"; // Assign the scene to switch to on collision.
     public float bounceHeight = 1.5f; // How high the player bounces.
     public float bounceForwardDistance = 2f; // How far forward the player bounces.
     public float bounceForce = 10f; // The force applied to bounce the player.
