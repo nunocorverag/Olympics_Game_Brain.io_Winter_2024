@@ -34,6 +34,7 @@ namespace Platformer.Mechanics
         internal Animator animator;
         readonly PlatformerModel model = Simulation.GetModel<PlatformerModel>();
         public string sceneToLoad = "Dummy";
+        private GameManager gameManager;
 
         public Bounds Bounds => collider2d.bounds;
 
@@ -55,6 +56,7 @@ namespace Platformer.Mechanics
 
         void Awake()
         {
+            gameManager = FindObjectOfType<GameManager>();
             health = GetComponent<Health>();
             audioSource = GetComponent<AudioSource>();
             collider2d = GetComponent<Collider2D>();
@@ -241,6 +243,7 @@ namespace Platformer.Mechanics
 
         IEnumerator SwitchSceneAfterDelay(float delay)
         {
+            gameManager.AddScore(60 - elapsedTime);
             Time.timeScale = 0;
             // Reset time scale to normal before changing the scene.
             yield return new WaitForSecondsRealtime(delay);
