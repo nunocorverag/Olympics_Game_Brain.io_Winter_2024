@@ -34,6 +34,7 @@ namespace Platformer.Mechanics
         internal Animator animator;
         readonly PlatformerModel model = Simulation.GetModel<PlatformerModel>();
         public string sceneToLoad = "Dummy";
+        private GameManager gameManager;
 
         public Bounds Bounds => collider2d.bounds;
 
@@ -43,8 +44,19 @@ namespace Platformer.Mechanics
         public TMP_Text timeText; // Assign this in the Inspector if using TextMeshPro
         private float elapsedTime = 0f; // Stores the total time elapsed
 
+        public void Jump()
+        {
+            if (IsGrounded)
+            {
+                Debug.Log("PlayerFenceController: Saltando...");
+                jumpTakeOffSpeed = baseJumpTakeOffSpeed;
+                velocity.y = jumpTakeOffSpeed * model.jumpModifier;
+            }
+        }
+
         void Awake()
         {
+            gameManager = FindObjectOfType<GameManager>();
             health = GetComponent<Health>();
             audioSource = GetComponent<AudioSource>();
             collider2d = GetComponent<Collider2D>();
@@ -231,6 +243,7 @@ namespace Platformer.Mechanics
 
         IEnumerator SwitchSceneAfterDelay(float delay)
         {
+            gameManager.AddScore(60 - elapsedTime);
             Time.timeScale = 0;
             // Reset time scale to normal before changing the scene.
             yield return new WaitForSecondsRealtime(delay);

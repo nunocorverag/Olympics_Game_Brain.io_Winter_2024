@@ -11,17 +11,19 @@ public class PlayerLanding : MonoBehaviour
     public TMP_Text scoreText; // Assign the UI Text element for displaying the score.
 
     private float highScore = 0; // Variable to store the high score.
-    public string sceneToLoad = "Dummy"; // Assign the scene to switch to on collision.
+    public string sceneToLoad = "Main"; // Assign the scene to switch to on collision.
     public float bounceHeight = 1.5f; // How high the player bounces.
     public float bounceForwardDistance = 2f; // How far forward the player bounces.
     public float bounceForce = 10f; // The force applied to bounce the player.
 
     public PlayerController playerController;
     private bool hasBounced = false;
-
+    private GameManager gameManager;
+    private float distanceX;
 
     void Start()
     {
+        gameManager = FindObjectOfType<GameManager>();
         scoreText.text = "High Score: " + highScore;
         hasBounced = false;
     }
@@ -34,7 +36,7 @@ public class PlayerLanding : MonoBehaviour
         {
             hasBounced = true;
             // Calculate the distance in x-axis from the player to the Sand.
-            float distanceX = Mathf.Abs(transform.position.x - playerTransform.position.x) * 100;
+            distanceX = Mathf.Abs(transform.position.x - playerTransform.position.x) * 100;
             Debug.Log("Collision detected with: " + collision.gameObject.name + distanceX);
             // Update the score text with the distance.
             if (distanceX > highScore)
@@ -53,6 +55,7 @@ public class PlayerLanding : MonoBehaviour
         // Check if the player landed on the "Sand" object.
         else
         {
+            gameManager.AddScore(distanceX);
             playerController.Stop();
             Time.timeScale = 1;
             StartCoroutine(SwitchSceneAfterDelay(2f));
