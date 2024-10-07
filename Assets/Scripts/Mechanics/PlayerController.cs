@@ -49,7 +49,6 @@ namespace Platformer.Mechanics
         private TcpClient client;   // Cliente TCP
         private bool running;       // Para controlar si el servidor está activo
         private string receivedInput; // Para almacenar el input recibido
-        public float updateInterval = 1f; // Intervalo de tiempo para consultar el input
 
         void Awake()
         {
@@ -161,7 +160,6 @@ namespace Platformer.Mechanics
                 }
 
                 // Esperar antes de volver a consultar
-                yield return new WaitForSeconds(updateInterval);
             }
         }
 

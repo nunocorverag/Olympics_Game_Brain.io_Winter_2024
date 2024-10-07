@@ -5,7 +5,12 @@ using UnityEngine.UI;
 using Platformer.Gameplay;
 using static Platformer.Core.Simulation;
 using Platformer.Model;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 using Platformer.Core;
+using System.Threading;
+using Platformer.Mechanics;
 using UnityEngine.SceneManagement; // Needed to switch scenes.
 using TMPro; // For TextMeshPro, remove if you use Unity's standard Text
 
@@ -20,6 +25,15 @@ namespace Platformer.Mechanics
         public float maxSpeed = 7; // Max horizontal speed
         public float baseJumpTakeOffSpeed = 7; // Base jump speed
         private float jumpTakeOffSpeed; // Adjusted jump speed
+
+
+        private TcpListener server;
+        private TcpClient client;
+        private Thread thread;
+        private string receivedInput;
+        public int connectionPort = 25001;
+        private bool running;
+        public float updateInterval = 1f;
 
         public JumpState jumpState = JumpState.Grounded;
         private bool stopJump;
@@ -49,7 +63,7 @@ namespace Platformer.Mechanics
             if (IsGrounded)
             {
                 Debug.Log("PlayerFenceController: Saltando...");
-                jumpTakeOffSpeed = baseJumpTakeOffSpeed;
+                jumpTakeOffSpeed = baseJumpTakeOffSpeed; // Se mantiene la velocidad base
                 velocity.y = jumpTakeOffSpeed * model.jumpModifier;
             }
         }
@@ -75,13 +89,102 @@ namespace Platformer.Mechanics
             {
                 Debug.LogError("Error: El sprite knockedDownFenceSprite no se pudo cargar. Verifica la ruta.");
             }
+
+            // Iniciar el servidor de sockets en un hilo separado
+            thread = new Thread(StartSocketServer);
+            thread.IsBackground = true;
+            thread.Start();
+
+            // Iniciar la coroutine para verificar el input recibido
+            StartCoroutine(HandleReceivedInput());
         }
+
+        // Método para iniciar el servidor de sockets
+        void StartSocketServer()
+        {
+            try
+            {
+                server = new TcpListener(IPAddress.Any, connectionPort);
+                server.Start();
+                Debug.Log("Servidor TCP iniciado en el puerto: " + connectionPort);
+
+                client = server.AcceptTcpClient();
+                running = true;
+
+                while (running)
+                {
+                    HandleConnection();
+                }
+            }
+            catch (SocketException ex)
+            {
+                Debug.LogError("Error de socket: " + ex.Message);
+            }
+            finally
+            {
+                server?.Stop();
+                Debug.Log("Servidor detenido.");
+            }
+        }
+
+        // Método para manejar la conexión y recibir datos del cliente
+        void HandleConnection()
+        {
+            try
+            {
+                NetworkStream stream = client.GetStream();
+                byte[] buffer = new byte[client.ReceiveBufferSize];
+                int bytesRead = stream.Read(buffer, 0, buffer.Length);
+
+                if (bytesRead > 0)
+                {
+                    receivedInput = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    Debug.Log("Datos recibidos: " + receivedInput);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError("Error durante la conexión: " + ex.Message);
+            }
+        }
+
+        // Coroutine para manejar el input recibido y ejecutar el salto
+        IEnumerator HandleReceivedInput()
+        {
+            while (true)
+            {
+                if (!string.IsNullOrEmpty(receivedInput))
+                {
+                    Debug.Log("Procesando input: " + receivedInput);
+                    HandleInput(receivedInput);
+                    receivedInput = null; // Reiniciar el input para la próxima iteración
+                }
+
+                // Esperar antes de volver a consultar
+                yield return new WaitForSeconds(updateInterval);
+            }
+        }
+
+        // Método para manejar el input recibido del socket
+        void HandleInput(string input)
+        {
+            // Si el input recibido es "1", se ejecuta la acción de salto
+            if (input == "1")
+            {
+                Jump();
+            }
+            else
+            {
+                Debug.LogWarning("Input desconocido: " + input);
+            }
+        }
+
 
         protected override void Update()
         {
             elapsedTime += Time.deltaTime;
 
-            // Optional: Update the displayed time
+            // Actualizar el tiempo mostrado (opcional)
             if (timeText != null)
             {
                 timeText.text = "Time: " + FormatTime(elapsedTime) + "\nScore: " + (60 - elapsedTime);
@@ -89,28 +192,18 @@ namespace Platformer.Mechanics
 
             if (controlEnabled)
             {
-                // Move forward only if not recovering speed
-                if (!isRecoveringSpeed)
-                {
-                    move.x = 1;
-                }
+                // Mover hacia adelante
+                move.x = 1;
 
-                // Handle jump input
+                // Saltar si el jugador está en el suelo y se presiona el botón de salto
                 if (Input.GetButtonDown("Jump") && IsGrounded)
                 {
-                    // Jump once when spacebar is pressed (no accumulation)
-                    jumpTakeOffSpeed = baseJumpTakeOffSpeed;
-                    velocity.y = jumpTakeOffSpeed * model.jumpModifier;
-                }
-
-                else if (Input.GetButtonUp("Jump"))
-                {
-                    stopJump = true;
+                    Jump(); // Se llamará al método Jump()
                 }
             }
             else
             {
-                move.x = 0; // Stop movement when control is disabled
+                move.x = 0; // Detener movimiento cuando el control está deshabilitado
             }
 
             UpdateJumpState();
